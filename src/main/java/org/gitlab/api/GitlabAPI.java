@@ -1523,6 +1523,19 @@ public class GitlabAPI {
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
     }
 
+    /**
+     * Return a Merge Request including its changes.
+     *
+     * @param projectId      The id of the project
+     * @param mergeRequestId The id of the merge request
+     * @return the Gitlab Merge Request
+     * @throws IOException on gitlab api call error
+     */
+    public List<GitlabCommit> getMergeRequestCommits(Serializable projectId, Integer mergeRequestId) {
+        String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId + GitlabCommit.URL;
+        return retrieve().getAll(tailUrl, GitlabCommit[].class);
+    }
+
     public GitlabMergeRequest getMergeRequest(Serializable projectId, Integer mergeRequestId) throws IOException {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + GitlabMergeRequest.URL + "/" + mergeRequestId;
         return retrieve().to(tailUrl, GitlabMergeRequest.class);
@@ -1731,16 +1744,15 @@ public class GitlabAPI {
 
     // List commit diffs for a project ID and commit hash
     // GET /projects/:id/repository/commits/:sha/diff
-    public List<GitlabCommitDiff> getCommitDiffs(Serializable projectId, String commitHash) throws IOException {
+    public List<GitlabCommitDiff> getCommitDiffs(Serializable projectId, String commitHash) {
         return getCommitDiffs(projectId, commitHash, new Pagination());
     }
 
     public List<GitlabCommitDiff> getCommitDiffs(Serializable projectId, String commitHash,
-                                                 Pagination pagination) throws IOException {
+                                                 Pagination pagination) {
         String tailUrl = GitlabProject.URL + "/" + sanitizeProjectId(projectId) + "/repository/commits/" + commitHash +
                 GitlabCommitDiff.URL + pagination;
-        GitlabCommitDiff[] diffs = retrieve().to(tailUrl, GitlabCommitDiff[].class);
-        return Arrays.asList(diffs);
+        return retrieve().getAll(tailUrl, GitlabCommitDiff[].class);
     }
 
 
